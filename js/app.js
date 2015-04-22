@@ -42,7 +42,13 @@ var CustomMarker = function(data){
 		draggable: this.dragg(),
 		icon:'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
 	});
-	if (this.visible()==false){ this.marker_point.setMap(null);}else {this.marker_point.setMap(Generalmap);}
+
+	this.VisibilityMap=ko.computed(function (){
+		if (this.visible()==false){ 
+			this.marker_point.setMap(null);
+		}else {
+			this.marker_point.setMap(Generalmap);}
+	},this);
 
 	this.hovered = function(data,event){
 		var $tr = $(event.target).parent();
@@ -97,32 +103,31 @@ var ViewModel=function(){
 			self.addView(false);
 		}else {self.addView(true);}	};
 	//	search function
-this.search=function(){console.lof("search");};
-//filter elements
-this.filteredMarkers = ko.dependentObservable(function() {
-	var filter = this.query().toLowerCase();
-	if (!filter) {
-		return this.markerList();
-	} else {
-		return ko.utils.arrayFilter(this.markerList(), function(marker) {
-			//arreglar el filtro ....
-			if (marker.fullSearch().match(filter)!=null){
-				return true;}else{return false;}
-			
-		});
-	}
-},this);
+	this.search=function(){console.lof("search");};
+	//filter elements
+	this.filteredMarkers = ko.dependentObservable(function() {
+		var filter = this.query().toLowerCase();
+		if (!filter) {
+			this.markerList().forEach(function(marker){marker.visible(true);});
+			return this.markerList();
+		} else {
+			return ko.utils.arrayFilter(this.markerList(), function(marker) {
+				if (marker.fullSearch().match(filter)!=null){
+				marker.visible(true);
+					return true;
+				}else{
+					marker.visible(false);
+					return false;
+				}
+			});
+		}
+	},this);
 
 	//click additional info
 	this.setCurrentMarker=function(){
 		console.log(this);
 	};
-
-
-
 };
-
-
 
 ko.applyBindings(new ViewModel());
 
