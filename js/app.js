@@ -2,17 +2,22 @@ var markerInitilization=[{
 	name:'House',
 	Lat:38.472324,
 	Lng:-0.793430,
-	comment:'La house wapa'
+	comment:'La house chula',
+	visible:true
 },{
 	name:'Pedro',
 	Lat:38.472330,
 	Lng:-0.7943,
-	comment:'pero que pollo el tipi'
+	comment:'pero que pollo el tipi',
+	visible:true
+
 },{
 	name:'Lolo',
 	Lat:38.4730,
 	Lng:-0.7942,
-	comment:'otro polluelo'
+	comment:'otro polluelo',
+	visible:true
+
 }];
 
 var Generalmap = new google.maps.Map(document.getElementById("map-canvas"), {
@@ -27,13 +32,17 @@ var CustomMarker = function(data){
 	this.Lat = ko.observable(data.Lat);
 	this.Lng = ko.observable(data.Lng);
 	this.dragg=ko.observable(false);
+	this.fullSearch=ko.computed(function(){return (this.name()+" "+this.comment()).toLowerCase();},this);
+	//console.log(this.fullSearch());
+	this.visible=ko.observable(data.visible);
+
 	this.marker_point = new google.maps.Marker({
 		position: new google.maps.LatLng(this.Lat(), this.Lng()),
 		title: this.name(),
-		map: Generalmap,
 		draggable: this.dragg(),
 		icon:'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
 	});
+	if (this.visible()==false){ this.marker_point.setMap(null);}else {this.marker_point.setMap(Generalmap);}
 
 	this.hovered = function(data,event){
 		var $tr = $(event.target).parent();
@@ -47,7 +56,11 @@ var CustomMarker = function(data){
 		$tr.removeClass('success');
 		this.marker_point.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
 	};
-
+	//set as current marker
+	// this.thisIsCurrent=function(){
+	// 	console.log(this);
+	// 	console.log(ViewModel.currentMarker());
+	// };
     //if you just need to update it when the user is done dragging
     google.maps.event.addListener(this.marker_point, 'dragend', function() {
     	var pos = this.marker_point.getPosition();
@@ -55,13 +68,6 @@ var CustomMarker = function(data){
     	this.Lng(pos.lng());
     }.bind(this));
 
-	// google.maps.event.addListener(this.marker_point, 'mouseover', function(event) {
- //    	console.log(this);
- //    	console.log(event);
-
- //         var rowId= this.rowId;
- //            $("#"+rowId).addClass("success");
- //    }.bind(this));    
 };
 
 
@@ -69,15 +75,17 @@ var ViewModel=function(){
 	var self=this;
 	this.advanceFilter=ko.observable(false);
 	this.addView=ko.observable(false);
+	this.query= ko.observable("");
 
 	this.markerList=ko.observableArray([]);
 	//initialize array markers
 	markerInitilization.forEach(function(marker){
 		self.markerList.push(new CustomMarker(marker));
 	});
-
 	this.currentMarker=ko.observable(this.markerList()[0]);
 
+
+	//view visibility
 	this.toggleVisibilityFilter=function(){
 		if (self.advanceFilter()){
 			self.advanceFilter(false);
@@ -88,11 +96,32 @@ var ViewModel=function(){
 		if (self.addView()){
 			self.addView(false);
 		}else {self.addView(true);}	};
+	//	search function
+this.search=function(){console.lof("search");};
+//filter elements
+this.filteredMarkers = ko.dependentObservable(function() {
+	var filter = this.query().toLowerCase();
+	if (!filter) {
+		return this.markerList();
+	} else {
+		return ko.utils.arrayFilter(this.markerList(), function(marker) {
+			//arreglar el filtro ....
+			if (marker.fullSearch().match(filter)!=null){
+				return true;}else{return false;}
+			
+		});
+	}
+},this);
 
-//	this.setCat=function(thisCat){
-//		self.currentCat(thisCat);
-//	}
+	//click additional info
+	this.setCurrentMarker=function(){
+		console.log(this);
+	};
+
+
+
 };
+
 
 
 ko.applyBindings(new ViewModel());
