@@ -43,6 +43,7 @@ var CustomMarker = function(data){
 		icon:'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
 	});
 
+
 	this.VisibilityMap=ko.computed(function (){
 		if (this.visible()==false){ 
 			this.marker_point.setMap(null);
@@ -50,23 +51,45 @@ var CustomMarker = function(data){
 			this.marker_point.setMap(Generalmap);}
 	},this);
 
+	//Mark in table and map with marker has the mouse over
 	this.hovered = function(data,event){
 		var $tr = $(event.target).parent();
 		$tr.addClass('success');
 		this.marker_point.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
 
 	};
-
 	this.unhovered = function(data,event){
 		var $tr = $(event.target).parent();
 		$tr.removeClass('success');
 		this.marker_point.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
 	};
-	//set as current marker
-	// this.thisIsCurrent=function(){
-	// 	console.log(this);
-	// 	console.log(ViewModel.currentMarker());
-	// };
+	google.maps.event.addListener(this.marker_point, 'mouseover', function() {
+		this.marker_point.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png'); 
+	}.bind(this));
+ 	google.maps.event.addListener(this.marker_point, 'mouseout', function() {
+		this.marker_point.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+ 	}.bind(this));
+	
+	//to show windows info from table
+
+	var infowindow = new google.maps.InfoWindow({
+ 	 content:"Hello World!"
+  	});
+
+	this.addInfo=function(){
+		Generalmap.setCenter(this.marker_point.getPosition());
+		  if (infowindow) {
+        	infowindow.close();
+    		}
+		console.log(this);
+		infowindow.open(Generalmap,this.marker_point);
+	};
+
+	//to show windows info from marker
+	google.maps.event.addListener(this.marker_point, 'click', function() {
+		this.addInfo();
+ 	}.bind(this));
+	
     //if you just need to update it when the user is done dragging
     google.maps.event.addListener(this.marker_point, 'dragend', function() {
     	var pos = this.marker_point.getPosition();
@@ -102,18 +125,20 @@ var ViewModel=function(){
 		if (self.addView()){
 			self.addView(false);
 		}else {self.addView(true);}	};
-	//	search function
+	//	search function NOTHING NOW MAYBE REMOVE
 	this.search=function(){console.lof("search");};
-	//filter elements
+	//filter elements hide in table and in map
 	this.filteredMarkers = ko.dependentObservable(function() {
 		var filter = this.query().toLowerCase();
+		//put all the markers if no query
 		if (!filter) {
 			this.markerList().forEach(function(marker){marker.visible(true);});
 			return this.markerList();
 		} else {
+			//check if query match with marker
 			return ko.utils.arrayFilter(this.markerList(), function(marker) {
 				if (marker.fullSearch().match(filter)!=null){
-				marker.visible(true);
+					marker.visible(true);
 					return true;
 				}else{
 					marker.visible(false);
@@ -122,7 +147,10 @@ var ViewModel=function(){
 			});
 		}
 	},this);
-
+	//prueba selec current marker
+	this.selec=function(){
+		console.log(this);
+	};
 	//click additional info
 	this.setCurrentMarker=function(){
 		console.log(this);

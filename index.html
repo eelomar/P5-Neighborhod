@@ -55,7 +55,7 @@ additional filtra por rango lat and long
 							<tr><th>Name Marker</th><th>Lat</th><th>Lng</th><th>Comment</th> </tr>
 						</thead>
 						<tbody data-bind="foreach: filteredMarkers">
-							<tr data-bind="if: visible() == true ,event: {mouseover: hovered, mouseleave: unhovered}" >
+							<tr data-bind="if: visible() == true ,event: {mouseover: hovered, mouseleave: unhovered, click :addInfo}" >
 								<td data-bind="text: name"></td>
 								<td data-bind="text: Lat().toFixed(6)"></td>
 								<td data-bind="text: Lng().toFixed(6)"></td>
