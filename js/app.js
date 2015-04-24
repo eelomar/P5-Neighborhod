@@ -3,35 +3,39 @@ var markerInitilization=[{
 	Lat:38.472324,
 	Lng:-0.793430,
 	comment:'La house chula',
-	visible:true
+	visible:true,
+	dragg:false
 },{
 	name:'Pedro',
 	Lat:38.472330,
 	Lng:-0.7943,
 	comment:'pero que pollo el tipi',
-	visible:true
+	visible:true,
+	dragg:false
 
 },{
 	name:'Lolo',
 	Lat:38.4730,
 	Lng:-0.7942,
 	comment:'otro polluelo',
-	visible:true
+	visible:true,
+	dragg:false
 
 }];
-
+try{
 var Generalmap = new google.maps.Map(document.getElementById("map-canvas"), {
 	zoom: 15,
 	center: new google.maps.LatLng(38.472324, -0.793430),
 	mapTypeId: google.maps.MapTypeId.ROADMAP
-});
+});}catch(e){alert('We are experiencing problems loading the Google Maps interface. ' +
+                            'We apologise for the inconvenience. Please try again later');}
 
 var CustomMarker = function(data){
 	this.name=ko.observable(data.name);
 	this.comment=ko.observable(data.comment);
 	this.Lat = ko.observable(data.Lat);
 	this.Lng = ko.observable(data.Lng);
-	this.dragg=ko.observable(false);
+	this.dragg=ko.observable(data.dragg);
 	this.fullSearch=ko.computed(function(){return (this.name()+" "+this.comment()).toLowerCase();},this);
 	//console.log(this.fullSearch());
 	this.visible=ko.observable(data.visible);
@@ -73,16 +77,14 @@ var CustomMarker = function(data){
 	//to show windows info from table
 
 	var infowindow = new google.maps.InfoWindow({
- 	 content:"Hello World!"
+ 	 content:"Hello World!"+""+this.name()
   	});
 
 	this.addInfo=function(){
+		//search();
 		Generalmap.setCenter(this.marker_point.getPosition());
-		  if (infowindow) {
-        	infowindow.close();
-    		}
-		console.log(this);
 		infowindow.open(Generalmap,this.marker_point);
+		
 	};
 
 	//to show windows info from marker
@@ -102,8 +104,6 @@ var CustomMarker = function(data){
 
 var ViewModel=function(){
 	var self=this;
-	this.advanceFilter=ko.observable(false);
-	this.addView=ko.observable(false);
 	this.query= ko.observable("");
 
 	this.markerList=ko.observableArray([]);
@@ -111,22 +111,6 @@ var ViewModel=function(){
 	markerInitilization.forEach(function(marker){
 		self.markerList.push(new CustomMarker(marker));
 	});
-	this.currentMarker=ko.observable(this.markerList()[0]);
-
-
-	//view visibility
-	this.toggleVisibilityFilter=function(){
-		if (self.advanceFilter()){
-			self.advanceFilter(false);
-		}else {self.advanceFilter(true);}
-	};
-
-	this.toggleVisibilityAdd=function(){
-		if (self.addView()){
-			self.addView(false);
-		}else {self.addView(true);}	};
-	//	search function NOTHING NOW MAYBE REMOVE
-	this.search=function(){console.lof("search");};
 	//filter elements hide in table and in map
 	this.filteredMarkers = ko.dependentObservable(function() {
 		var filter = this.query().toLowerCase();
@@ -147,14 +131,7 @@ var ViewModel=function(){
 			});
 		}
 	},this);
-	//prueba selec current marker
-	this.selec=function(){
-		console.log(this);
-	};
-	//click additional info
-	this.setCurrentMarker=function(){
-		console.log(this);
-	};
+
 };
 
 ko.applyBindings(new ViewModel());

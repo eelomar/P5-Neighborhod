@@ -18,15 +18,13 @@
 
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
-				<li class="btn btn-default navbar-btn" data-bind="click:toggleVisibilityAdd">Admin View</li>
-				<li class="btn btn-default navbar-btn" data-bind="click:toggleVisibilityFilter">Additional Filtering</li>
+				<li class="btn btn-default navbar-btn">Wellcome to P5 Udacity: Neightborhood Map </li>
 			</ul>
 			<form class="navbar-form">
 				<div class="form-group" style="display:inline;">
 					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span> </span>
 						<input type="text" class="form-control" data-bind="value: query, valueUpdate: 'keyup'" >
-
-						<span class="input-group-addon" data-bind="click:search"><span class="glyphicon glyphicon-search"></span> </span>
 					</div>
 				</div>
 			</form>
@@ -38,17 +36,6 @@
 	<div class="container-fluid">
 		<div class="row" id="main">
 			<div class="col-md-4" id="info">
-				<div  id="filtering" data-bind="visible:advanceFilter">
-					NOmbre+commentario-->busqueda normal
-additional filtra por rango lat and long
-					<hr>
-				</div>
-				<div  id="search-result" data-bind="visible:addView"> 
-				
-
-
-					<hr>
-				</div>
 				<div  id="markers_table">
 					<table class="table">
 						<thead>
